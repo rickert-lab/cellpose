@@ -4,7 +4,7 @@ Copyright © 2025 Howard Hughes Medical Institute, Authored by Carsen Stringer, 
 
 import sys, os, pathlib, warnings, datetime, time, copy
 
-from qtpy import QtGui, QtCore
+from qtpy import API_NAME, QtGui, QtCore
 from superqt import QRangeSlider, QCollapsible
 from qtpy.QtWidgets import QScrollArea, QMainWindow, QApplication, QWidget, QScrollBar, \
     QComboBox, QGridLayout, QPushButton, QFrame, QCheckBox, QLabel, QProgressBar, \
@@ -274,7 +274,13 @@ class MainW(QMainWindow):
         self.reset()
 
         # This needs to go after .reset() is called to get state fully set up:
-        self.autobtn.checkStateChanged.connect(self.compute_saturation_if_checked)
+        match API_NAME:
+            case 'PyQt5':
+                self.autobtn.stateChanged.connect(self.compute_saturation_if_checked)
+            case 'PyQt6':
+                self.autobtn.checkStateChanged.connect(self.compute_saturation_if_checked)
+            case _:
+                print(f"Unsupported PyQT version: {API_NAME}.")
 
         self.load_3D = False
 
